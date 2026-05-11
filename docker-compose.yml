@@ -1,0 +1,7 @@
+services:
+  wms:
+    build: .
+    container_name: magerwa-wms
+    ports:
+      - "8085:8085"
+    restart: unless-stopped

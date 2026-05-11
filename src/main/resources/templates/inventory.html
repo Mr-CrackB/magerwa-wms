@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - Magerwa WMS</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2>MAGERWA WMS</h2>
+            <div class="user-name" th:text="${user.fullName}">User</div>
+            <div class="user-role" th:text="${user.role.displayName}">Role</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard"><span class="icon">📊</span> <span class="text">Dashboard</span></a>
+            <a href="/inventory" class="active"><span class="icon">📦</span> <span class="text">Inventory</span></a>
+            <a href="/orders"><span class="icon">📋</span> <span class="text">Orders</span></a>
+            <a href="/clients"><span class="icon">👥</span> <span class="text">Clients</span></a>
+            <a href="/reports"><span class="icon">📄</span> <span class="text">Reports</span></a>
+            <a th:if="${user.role.name() == 'ADMIN' or user.role.name() == 'MANAGER'}" href="/users"><span class="icon">🔑</span> <span class="text">User Accounts</span></a>
+        </nav>
+        <div class="sidebar-logout"><a href="/logout"><span class="icon">🚪</span> <span class="text">Logout</span></a></div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">Inventory Management</h1>
+        <p class="page-subtitle">Manage warehouse stock across all Magerwa locations</p>
+
+        <!-- Add Item Form -->
+        <div class="form-card">
+            <h3>+ Add New Inventory Item</h3>
+            <form method="post" action="/inventory/add">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" name="productName" placeholder="e.g., Cement Bags" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category" required>
+                            <option value="Construction">Construction</option>
+                            <option value="Food & Beverages">Food & Beverages</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Textiles">Textiles</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Automotive">Automotive</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" placeholder="0" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Storage Location</label>
+                        <input type="text" name="storageLocation" placeholder="e.g., Gikondo - Zone A, Bay 5" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-teal">Add Item</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="toolbar">
+            <form method="get" action="/inventory" style="display:flex; gap:10px;">
+                <input type="text" name="search" placeholder="Search by product name..." th:value="${search}" style="width:300px;">
+                <button type="submit" class="btn btn-blue btn-sm">Search</button>
+            </form>
+            <div class="spacer"></div>
+            <a href="/inventory" class="btn btn-sm" style="background:#64748B;color:white;">Clear</a>
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item ID</th><th>Product Name</th><th>Category</th>
+                        <th>Qty</th><th>Location</th><th>Date Received</th>
+                        <th>Status</th><th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${items}">
+                        <td th:text="${item.itemId}"></td>
+                        <td th:text="${item.productName}"></td>
+                        <td th:text="${item.category}"></td>
+                        <td th:text="${item.quantity}"></td>
+                        <td th:text="${item.storageLocation}"></td>
+                        <td th:text="${item.dateReceived}"></td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${item.status == 'In Stock'} ? 'badge-green' :
+                                                  (${item.status == 'Low Stock'} ? 'badge-yellow' : 'badge-red')"
+                                  th:text="${item.status}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/inventory/delete/' + ${item.itemId}}" class="btn btn-red btn-sm"
+                               onclick="return confirm('Delete this item?')">Delete</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(items)}">
+                        <td colspan="8" style="text-align:center; color:#94A3B8; padding:30px;">No items found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

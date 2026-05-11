@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Magerwa WMS</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2>MAGERWA WMS</h2>
+            <div class="user-name" th:text="${user.fullName}">User</div>
+            <div class="user-role" th:text="${user.role.displayName}">Role</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="active"><span class="icon">📊</span> <span class="text">Dashboard</span></a>
+            <a href="/inventory"><span class="icon">📦</span> <span class="text">Inventory</span></a>
+            <a href="/orders"><span class="icon">📋</span> <span class="text">Orders</span></a>
+            <a href="/clients"><span class="icon">👥</span> <span class="text">Clients</span></a>
+            <a href="/reports"><span class="icon">📄</span> <span class="text">Reports</span></a>
+            <a th:if="${user.role.name() == 'ADMIN' or user.role.name() == 'MANAGER'}" href="/users"><span class="icon">🔑</span> <span class="text">User Accounts</span></a>
+        </nav>
+        <div class="sidebar-logout">
+            <a href="/logout"><span class="icon">🚪</span> <span class="text">Logout</span></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard Overview</h1>
+            <p class="page-subtitle">Welcome back, <strong th:text="${user.fullName}">User</strong> 👋</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card stat-blue">
+                <div class="stat-icon">📦</div>
+                <div class="stat-value" th:text="${totalProducts}">0</div>
+                <div class="stat-label">Total Products</div>
+                <div class="stat-sub">Items in warehouse</div>
+            </div>
+            <div class="stat-card stat-teal">
+                <div class="stat-icon">🏷️</div>
+                <div class="stat-value" th:text="${totalUnits}">0</div>
+                <div class="stat-label">Units in Stock</div>
+                <div class="stat-sub">Across all locations</div>
+            </div>
+            <div class="stat-card stat-orange">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-value" th:text="${pendingOrders}">0</div>
+                <div class="stat-label">Pending Orders</div>
+                <div class="stat-sub">Awaiting processing</div>
+            </div>
+            <div class="stat-card stat-red">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-value" th:text="${lowStockCount}">0</div>
+                <div class="stat-label">Low Stock Alerts</div>
+                <div class="stat-sub">Items below threshold</div>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+            <div class="card">
+                <h3 class="card-title">📋 Recent Orders</h3>
+                <table>
+                    <thead><tr><th>Order ID</th><th>Client</th><th>Product</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td style="font-weight:600;" th:text="${order.orderId}"></td>
+                            <td th:text="${order.clientName}"></td>
+                            <td th:text="${order.productName}"></td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${order.status == 'Completed'} ? 'badge-green' : (${order.status == 'Processing'} ? 'badge-blue' : (${order.status == 'Pending'} ? 'badge-yellow' : 'badge-red'))"
+                                      th:text="${order.status}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <div class="card" th:if="${!alerts.isEmpty()}">
+                    <h3 class="card-title">🔔 Stock Alerts</h3>
+                    <div th:each="alert : ${alerts}" class="alert-item" th:text="${alert}"></div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">⚡ Quick Actions</h3>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <a href="/inventory" class="activity-item" style="font-weight:500;">📦 Manage Inventory →</a>
+                        <a href="/orders" class="activity-item" style="font-weight:500;">📋 Process Orders →</a>
+                        <a href="/clients" class="activity-item" style="font-weight:500;">👥 View Clients →</a>
+                        <a href="/reports" class="activity-item" style="font-weight:500;">📄 Generate Reports →</a>
+                        <a th:if="${user.role.name() == 'ADMIN' or user.role.name() == 'MANAGER'}" href="/users" class="activity-item" style="font-weight:500;">🔑 Manage User Accounts →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

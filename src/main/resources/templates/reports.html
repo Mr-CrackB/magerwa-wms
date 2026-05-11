@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Magerwa WMS</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2>MAGERWA WMS</h2>
+            <div class="user-name" th:text="${user.fullName}">User</div>
+            <div class="user-role" th:text="${user.role.displayName}">Role</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard"><span class="icon">📊</span> <span class="text">Dashboard</span></a>
+            <a href="/inventory"><span class="icon">📦</span> <span class="text">Inventory</span></a>
+            <a href="/orders"><span class="icon">📋</span> <span class="text">Orders</span></a>
+            <a href="/clients"><span class="icon">👥</span> <span class="text">Clients</span></a>
+            <a href="/reports" class="active"><span class="icon">📄</span> <span class="text">Reports</span></a>
+            <a th:if="${user.role.name() == 'ADMIN' or user.role.name() == 'MANAGER'}" href="/users"><span class="icon">🔑</span> <span class="text">User Accounts</span></a>
+        </nav>
+        <div class="sidebar-logout"><a href="/logout"><span class="icon">🚪</span> <span class="text">Logout</span></a></div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">Report Generation</h1>
+        <p class="page-subtitle">
+            Select a report type below — each is created using the <strong>Factory Method Pattern</strong>.
+            The ReportFactory determines which concrete report class to instantiate.
+        </p>
+
+        <!-- Report Type Buttons (Factory Pattern selection) -->
+        <div class="report-buttons">
+            <form method="post" action="/reports/generate" style="display:inline;">
+                <input type="hidden" name="reportType" value="Inventory Report">
+                <button type="submit" class="report-btn bg-blue">
+                    <span class="report-title">📦 Inventory Report</span>
+                    <span class="report-desc">Current stock levels across all zones</span>
+                </button>
+            </form>
+
+            <form method="post" action="/reports/generate" style="display:inline;">
+                <input type="hidden" name="reportType" value="Order Report">
+                <button type="submit" class="report-btn bg-teal">
+                    <span class="report-title">📋 Order Report</span>
+                    <span class="report-desc">Order summary with status breakdown</span>
+                </button>
+            </form>
+
+            <form method="post" action="/reports/generate" style="display:inline;">
+                <input type="hidden" name="reportType" value="Low Stock Report">
+                <button type="submit" class="report-btn bg-red">
+                    <span class="report-title">⚠ Low Stock Report</span>
+                    <span class="report-desc">Items below minimum threshold</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Report Output -->
+        <div class="card">
+            <h3 class="card-title" th:if="${selectedType}" th:text="'Generated: ' + ${selectedType}">Report Output</h3>
+            <h3 class="card-title" th:unless="${selectedType}">Report Output</h3>
+
+            <div class="report-output" th:if="${reportContent}" th:text="${reportContent}"></div>
+            <div class="report-output" th:unless="${reportContent}">
+Select a report type above to generate...
+
+DESIGN PATTERN: Factory Method Pattern
+─────────────────────────────────────────
+The ReportFactory.createReport(type) method determines which
+concrete report to create based on the selected type:
+
+  • "Inventory Report"  → creates InventoryReport
+  • "Order Report"      → creates OrderReport
+  • "Low Stock Report"  → creates LowStockReport
+
+Each report type generates its own content independently.
+New report types can be added without modifying existing code
+(Open/Closed Principle from SOLID).
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

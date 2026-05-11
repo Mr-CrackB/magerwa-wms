@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magerwa WMS - Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="login-container">
+    <div class="login-brand">
+        <h1>MAGERWA</h1>
+        <div class="subtitle">Warehouse Management System</div>
+        <div class="desc">
+            Streamlining warehouse operations<br>
+            for Rwanda's leading logistics provider
+        </div>
+        <div class="badge">🏭 EST. 1969 — KIGALI, RWANDA</div>
+    </div>
+    <div class="login-form">
+        <div class="login-form-inner">
+            <h2>Welcome Back</h2>
+            <p class="sub">Sign in to your WMS account</p>
+            <p th:if="${error}" class="error-msg">⚠ <span th:text="${error}">Error</span></p>
+            <form method="post" action="/login">
+                <div class="form-group">
+                    <label>👤 Username</label>
+                    <input type="text" name="username" placeholder="Enter your username" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label>🔒 Password</label>
+                    <input type="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In →</button>
+            </form>
+            <p class="hint">Demo credentials: <strong>admin</strong> / admin123 &nbsp;·&nbsp; <strong>manager</strong> / mgr123 &nbsp;·&nbsp; <strong>staff1</strong> / staff123<br>Client logins: <strong>mcd_client</strong> / mcd123 &nbsp;·&nbsp; <strong>inyange_client</strong> / inyange123</p>
+            <p class="hint" style="margin-top:10px;">Don't have an account? <a href="/register" style="color:#1A6FB5; font-weight:600;">Create one here</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

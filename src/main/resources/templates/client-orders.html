@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Magerwa WMS</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2>MAGERWA WMS</h2>
+            <div class="user-name" th:text="${user.fullName}">Client</div>
+            <div class="user-role" th:text="${user.role.displayName}">Client</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/client/orders" class="active"><span class="icon">📋</span> <span class="text">My Orders</span></a>
+        </nav>
+        <div class="sidebar-logout">
+            <a href="/logout"><span class="icon">🚪</span> <span class="text">Logout</span></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">My Orders</h1>
+        <p class="page-subtitle">Place new orders and track the status of your existing ones</p>
+
+        <!-- Place Order Form -->
+        <div class="form-card">
+            <h3>+ Place New Order</h3>
+            <form method="post" action="/client/orders/add">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product</label>
+                        <input type="text" name="productName" placeholder="Product name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" placeholder="0" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="orderType" required>
+                            <option value="Inbound">Inbound</option>
+                            <option value="Outbound">Outbound</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-teal">Place Order</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter -->
+        <div class="toolbar">
+            <form method="get" action="/client/orders" style="display:flex; gap:10px;">
+                <select name="status" style="padding:8px 14px; border:1.5px solid #CBD5E1; border-radius:6px;">
+                    <option value="All">All Orders</option>
+                    <option value="Pending"    th:selected="${filterStatus == 'Pending'}">Pending</option>
+                    <option value="Processing" th:selected="${filterStatus == 'Processing'}">Processing</option>
+                    <option value="Completed"  th:selected="${filterStatus == 'Completed'}">Completed</option>
+                    <option value="Cancelled"  th:selected="${filterStatus == 'Cancelled'}">Cancelled</option>
+                </select>
+                <button type="submit" class="btn btn-blue btn-sm">Filter</button>
+            </form>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.orderId}"></td>
+                        <td th:text="${order.productName}"></td>
+                        <td th:text="${order.quantity}"></td>
+                        <td th:text="${order.orderDate}"></td>
+                        <td th:text="${order.orderType}"></td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${order.status == 'Completed'} ? 'badge-green' :
+                                                  (${order.status == 'Processing'} ? 'badge-blue' :
+                                                  (${order.status == 'Pending'} ? 'badge-yellow' : 'badge-red'))"
+                                  th:text="${order.status}"></span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(orders)}" class="empty-row">
+                        <td colspan="6">No orders found. Place your first order above.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

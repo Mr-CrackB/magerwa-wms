@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Magerwa WMS</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2>MAGERWA WMS</h2>
+            <div class="user-name" th:text="${user.fullName}">User</div>
+            <div class="user-role" th:text="${user.role.displayName}">Role</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/dashboard"><span class="icon">📊</span> <span class="text">Dashboard</span></a>
+            <a href="/inventory"><span class="icon">📦</span> <span class="text">Inventory</span></a>
+            <a href="/orders" class="active"><span class="icon">📋</span> <span class="text">Orders</span></a>
+            <a href="/clients"><span class="icon">👥</span> <span class="text">Clients</span></a>
+            <a href="/reports"><span class="icon">📄</span> <span class="text">Reports</span></a>
+            <a th:if="${user.role.name() == 'ADMIN' or user.role.name() == 'MANAGER'}" href="/users"><span class="icon">🔑</span> <span class="text">User Accounts</span></a>
+        </nav>
+        <div class="sidebar-logout"><a href="/logout"><span class="icon">🚪</span> <span class="text">Logout</span></a></div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">Order Management</h1>
+        <p class="page-subtitle">Track and manage inbound and outbound orders</p>
+
+        <!-- Add Order Form -->
+        <div class="form-card">
+            <h3>+ Create New Order</h3>
+            <form method="post" action="/orders/add">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" name="clientName" placeholder="Client company" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Product</label>
+                        <input type="text" name="productName" placeholder="Product name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" name="quantity" placeholder="0" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="orderType" required>
+                            <option value="Inbound">Inbound</option>
+                            <option value="Outbound">Outbound</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-teal">Create Order</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter Toolbar -->
+        <div class="toolbar">
+            <form method="get" action="/orders" style="display:flex; gap:10px;">
+                <select name="status" style="padding:8px 14px; border:1.5px solid #CBD5E1; border-radius:6px;">
+                    <option value="All">All Orders</option>
+                    <option value="Pending" th:selected="${filterStatus == 'Pending'}">Pending</option>
+                    <option value="Processing" th:selected="${filterStatus == 'Processing'}">Processing</option>
+                    <option value="Completed" th:selected="${filterStatus == 'Completed'}">Completed</option>
+                    <option value="Cancelled" th:selected="${filterStatus == 'Cancelled'}">Cancelled</option>
+                </select>
+                <button type="submit" class="btn btn-blue btn-sm">Filter</button>
+            </form>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th><th>Client</th><th>Product</th>
+                        <th>Qty</th><th>Date</th><th>Type</th>
+                        <th>Status</th><th>Update Status</th><th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.orderId}"></td>
+                        <td th:text="${order.clientName}"></td>
+                        <td th:text="${order.productName}"></td>
+                        <td th:text="${order.quantity}"></td>
+                        <td th:text="${order.orderDate}"></td>
+                        <td th:text="${order.orderType}"></td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${order.status == 'Completed'} ? 'badge-green' :
+                                                  (${order.status == 'Processing'} ? 'badge-blue' :
+                                                  (${order.status == 'Pending'} ? 'badge-yellow' : 'badge-red'))"
+                                  th:text="${order.status}"></span>
+                        </td>
+                        <td>
+                            <form method="post" action="/orders/updateStatus" style="display:flex; gap:5px;">
+                                <input type="hidden" name="orderId" th:value="${order.orderId}">
+                                <select name="newStatus" style="padding:4px; font-size:11px; border-radius:4px; border:1px solid #CBD5E1;">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn btn-blue btn-sm">Go</button>
+                            </form>
+                        </td>
+                        <td>
+                            <a th:href="@{'/orders/delete/' + ${order.orderId}}" class="btn btn-red btn-sm"
+                               onclick="return confirm('Delete this order?')">Del</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
