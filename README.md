@@ -168,4 +168,4 @@ Login → Dashboard → Inventory (add/search/delete)
 6. **No unnecessary complexity** — clean, readable code throughout
 
 ---
-**Author:** Prince | **Course:** SENG 8240 | **Institution:** AUCA | **Case Study:** Magerwa Ltd
+**Author:** Blaise | **Course:** SENG 8240 | **Institution:** AUCA | **Case Study:** Magerwa Ltd
