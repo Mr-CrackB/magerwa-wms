@@ -21,7 +21,7 @@ cd WMS
 mvn spring-boot:run
 
 # 3. Open your browser
-# Go to: http://localhost:8080
+# Go to: http://localhost:8085
 ```
 
 ### Demo Login Credentials
