@@ -53,6 +53,7 @@ public class InventoryService {
                 quantity, location, LocalDate.now(), status);
         inventoryDAO.save(item);
         inventorySubject.notifyObservers(productName, 0, quantity);
+        stockAlertObserver.notifyNewItem(productName, category, quantity);
     }
 
     public void deleteItem(String itemId) { inventoryDAO.delete(itemId); }
@@ -64,4 +65,16 @@ public class InventoryService {
     }
 
     public List<String> getAlerts() { return stockAlertObserver.getAlertLog(); }
+
+    public List<com.wms.model.ClientNotification> getClientNotifications() {
+        return stockAlertObserver.getClientNotifications();
+    }
+
+    public long getUnreadNotificationCount() {
+        return stockAlertObserver.getUnreadCount();
+    }
+
+    public void markNotificationsRead() {
+        stockAlertObserver.markAllRead();
+    }
 }

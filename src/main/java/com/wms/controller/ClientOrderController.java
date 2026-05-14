@@ -3,6 +3,7 @@ package com.wms.controller;
 import com.wms.model.Order;
 import com.wms.model.User;
 import com.wms.repository.OrderDAO;
+import com.wms.service.InventoryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,16 +14,18 @@ import java.util.UUID;
 
 /**
  * Controller for the client self-service portal.
- * Clients can view only their own orders and place new ones.
+ * Clients can view notifications, browse stock, and manage their orders.
  */
 @Controller
 @RequestMapping("/client")
 public class ClientOrderController {
 
     private final OrderDAO orderDAO;
+    private final InventoryService inventoryService;
 
-    public ClientOrderController(OrderDAO orderDAO) {
+    public ClientOrderController(OrderDAO orderDAO, InventoryService inventoryService) {
         this.orderDAO = orderDAO;
+        this.inventoryService = inventoryService;
     }
 
     private User getClient(HttpSession session) {
@@ -31,6 +34,7 @@ public class ClientOrderController {
         return user;
     }
 
+    /** Client orders page */
     @GetMapping("/orders")
     public String viewOrders(@RequestParam(required = false) String status,
                              HttpSession session, Model model) {
@@ -45,9 +49,24 @@ public class ClientOrderController {
 
         model.addAttribute("user", client);
         model.addAttribute("orders", orders);
+        model.addAttribute("unreadCount", inventoryService.getUnreadNotificationCount());
         return "client-orders";
     }
 
+    /** Client stock browsing page with notifications */
+    @GetMapping("/stock")
+    public String viewStock(HttpSession session, Model model) {
+        User client = getClient(session);
+        if (client == null) return "redirect:/";
+
+        model.addAttribute("user", client);
+        model.addAttribute("items", inventoryService.getAllItems());
+        model.addAttribute("notifications", inventoryService.getClientNotifications());
+        inventoryService.markNotificationsRead();
+        return "client-stock";
+    }
+
+    /** Place order — can be triggered from stock page */
     @PostMapping("/orders/add")
     public String placeOrder(@RequestParam String productName,
                              @RequestParam int quantity,

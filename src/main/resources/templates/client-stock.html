@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Stock - Magerwa WMS</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-layout">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h2>MAGERWA WMS</h2>
+            <div class="user-name" th:text="${user.fullName}">Client</div>
+            <div class="user-role" th:text="${user.role.displayName}">Client</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/client/stock" class="active"><span class="icon">📦</span> <span class="text">Available Stock</span></a>
+            <a href="/client/orders"><span class="icon">📋</span> <span class="text">My Orders</span></a>
+        </nav>
+        <div class="sidebar-logout">
+            <a href="/logout"><span class="icon">🚪</span> <span class="text">Logout</span></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">Available Stock</h1>
+        <p class="page-subtitle">Browse warehouse inventory and place orders directly</p>
+
+        <!-- Notifications Panel -->
+        <div th:if="${!#lists.isEmpty(notifications)}" style="margin-bottom:24px;">
+            <div style="background:#EFF6FF; border:1.5px solid #BFDBFE; border-radius:10px; padding:16px 20px;">
+                <h3 style="color:#1D4ED8; margin:0 0 12px 0;">🔔 New Stock Notifications</h3>
+                <ul style="list-style:none; padding:0; margin:0;">
+                    <li th:each="notif : ${notifications}"
+                        style="padding:8px 0; border-bottom:1px solid #DBEAFE; color:#1E40AF; font-size:0.95rem;">
+                        <span style="color:#64748B; font-size:0.82rem;" th:text="${notif.timestamp}"></span><br>
+                        🆕 <span th:text="${notif.message}"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Stock Table -->
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Available Qty</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${items}">
+                        <td th:text="${item.productName}"></td>
+                        <td th:text="${item.category}"></td>
+                        <td th:text="${item.quantity}"></td>
+                        <td th:text="${item.storageLocation}"></td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${item.status == 'In Stock'} ? 'badge-green' :
+                                                  (${item.status == 'Low Stock'} ? 'badge-yellow' : 'badge-red')"
+                                  th:text="${item.status}"></span>
+                        </td>
+                        <td>
+                            <form method="post" action="/client/orders/add" style="display:flex; gap:6px; align-items:center;">
+                                <input type="hidden" name="productName" th:value="${item.productName}">
+                                <input type="hidden" name="orderType" value="Outbound">
+                                <input type="number" name="quantity" placeholder="Qty" min="1"
+                                       th:max="${item.quantity}"
+                                       style="width:70px; padding:5px 8px; border:1.5px solid #CBD5E1; border-radius:6px;"
+                                       required>
+                                <button type="submit" class="btn btn-teal btn-sm"
+                                        th:disabled="${item.status == 'Out of Stock'}">Order</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(items)}" class="empty-row">
+                        <td colspan="6">No stock available at the moment.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

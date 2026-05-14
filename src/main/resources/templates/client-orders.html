@@ -15,6 +15,9 @@
             <div class="user-role" th:text="${user.role.displayName}">Client</div>
         </div>
         <nav class="sidebar-nav">
+            <a href="/client/stock"><span class="icon">📦</span> <span class="text">Available Stock
+                <span th:if="${unreadCount > 0}" style="background:#EF4444;color:white;border-radius:10px;padding:1px 7px;font-size:0.75rem;margin-left:4px;" th:text="${unreadCount}"></span>
+            </span></a>
             <a href="/client/orders" class="active"><span class="icon">📋</span> <span class="text">My Orders</span></a>
         </nav>
         <div class="sidebar-logout">
