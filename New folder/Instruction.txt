@@ -1,0 +1,6 @@
+// Use the command below to run the project in your Pc after extraction
+
+
+docker load -i magerwa-wms.tar
+docker run -p 8085:8085 wms-wms:latest
+ 
